@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+</head>
+<body>
+    <a href="http://www.google.com">Google</a>
+    
+    <form action="#" method="GET">
+            <input type="text" placeholder="name" value="Kerri" name="name">
+            <button>Do Something</button>
+    </form>
+    <script>
+
+        var a = document.querySelector('a');
+        a.addEventListener('click', (e)=>{
+            e.preventDefault();
+            window.location='http://www.neit.edu';
+        })
+
+        var input = document.querySelector('input')
+
+        input.addEventListener('focus', (e)=>{
+            e.target.style.backgroundColor = 'yellow'
+        })
+
+        input.addEventListener('blur', (e)=>{
+            e.target.style.backgroundColor = 'white'
+        })
+
+        input.addEventListener('change', (e)=>{
+            e.target.value = 'Kerby'
+        })
+
+        input.addEventListener('input', (e)=>{
+            e.target.value = 'Kerby'
+        })
+
+    
+
+    </script>
+</body>
+</html>
