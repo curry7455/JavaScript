@@ -1,0 +1,23 @@
+body {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #CED0CE;
+}
+
+canvas {
+    border: 5px solid #ffffff; /* White border around the canvas */
+    background-color: #E6E8E6; /* Slightly different red for the canvas */
+}
+
+/* Optional: Customize the paddle and ball colors */
+.paddle {
+    background-color: #ffffff; /* White paddles */
+}
+
+.ball {
+    background-color: #ffffff; /* White ball */
+}
