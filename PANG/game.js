@@ -36,14 +36,12 @@ function gameLoop() {
 
     // Ball collision with paddles and scoring
     if (collide(ball, pad[0])) {
-        player[0].updateScore(1);
         ball.vx = Math.abs(ball.vx);
         ball.x = pad[0].x + pad[0].w / 2 + ball.w / 2;
         generateParticles(ball, ball.x, ball.y);
     }
 
     if (collide(ball, pad[1])) {
-        player[1].updateScore(1);
         ball.vx = -Math.abs(ball.vx);
         ball.x = pad[1].x - pad[1].w / 2 - ball.w / 2;
         generateParticles(ball, ball.x, ball.y);
@@ -68,17 +66,19 @@ function constrainPaddles(paddle) {
     }
 }
 
-// Function to handle ball collision with walls
+// Function to handle ball collision with walls and update scores
 function handleBallCollisionWithWalls() {
     if (ball.y - ball.h / 2 < 0 || ball.y + ball.h / 2 > c.height) {
         ball.vy = -ball.vy;
     }
     if (ball.x - ball.w / 2 < 0) {
-        player[1].updateScore(1);
+        player[1].updateScore(1); // Player 2 scores
         resetBall();
+        logScores();
     } else if (ball.x + ball.w / 2 > c.width) {
-        player[0].updateScore(1);
+        player[0].updateScore(1); // Player 1 scores
         resetBall();
+        logScores();
     }
 }
 
@@ -88,6 +88,11 @@ function resetBall() {
     ball.y = c.height / 2;
     ball.vx = (Math.random() > 0.5 ? 1 : -1) * 5;
     ball.vy = (Math.random() * 4) - 2;
+}
+
+// Function to log both players' scores in the format "0 | 0"
+function logScores() {
+    console.log(`${player[0].score} | ${player[1].score}`);
 }
 
 // Function to detect collision between two objects
