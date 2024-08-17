@@ -1,58 +1,96 @@
-// Initializing variables
+// Initialize canvas and context
 const c = document.getElementById('gameCanvas');
 const ctx = c.getContext('2d');
 
-// Existing paddle and ball initialization
-let p1 = new GameObject(50, c.height / 2, 20, 100, 'rgba(255, 0, 0)');
-let p2 = new GameObject(c.width - 50, c.height / 2, 20, 100, 'rgba(255, 0, 0)');
+// Declare the player array
+let player = [];
+
+// Declare the pad array
+let pad = [];
+
+// Add new Player instances to the array
+player[0] = new Player('Player 1', new Box(50, c.height / 2, 20, 100, 'rgba(255, 0, 0)'));
+player[1] = new Player('Player 2', new Box(c.width - 50, c.height / 2, 20, 100, 'rgba(255, 0, 0)'));
+
+// Assign paddles to the pad array
+pad[0] = player[0].pad;
+pad[1] = player[1].pad;
+
+// Existing ball initialization
 let ball = new GameObject(c.width / 2, c.height / 2, 20, 20, 'rgba(25, 25, 25)');
 
-// Player instances
-let player1 = new Player('Player 1', p1);
-let player2 = new Player('Player 2', p2);
-
-function main() {
+// Example game loop
+function gameLoop() {
     ctx.clearRect(0, 0, c.width, c.height);
-    handleInput();
-    p1.move();
-    p2.move();
+    
+    // Update and render paddles
+    pad.forEach(paddle => {
+        paddle.move();
+        constrainPaddles(paddle);
+        paddle.render();
+    });
 
-    // Paddle boundary checks and ball movement
-    constrainPaddles();
+    // Ball movement and collision handling
     ball.move();
-
-    // Ball collision with walls
     handleBallCollisionWithWalls();
 
     // Ball collision with paddles and scoring
-    if (collide(ball, player1.pad)) {
-        player1.updateScore(1);
+    if (collide(ball, pad[0])) {
+        player[0].updateScore(1);
         ball.vx = Math.abs(ball.vx);
-        ball.x = player1.pad.x + player1.pad.w / 2 + ball.w / 2;
+        ball.x = pad[0].x + pad[0].w / 2 + ball.w / 2;
         generateParticles(ball, ball.x, ball.y);
     }
 
-    if (collide(ball, player2.pad)) {
-        player2.updateScore(1);
+    if (collide(ball, pad[1])) {
+        player[1].updateScore(1);
         ball.vx = -Math.abs(ball.vx);
-        ball.x = player2.pad.x - player2.pad.w / 2 - ball.w / 2;
+        ball.x = pad[1].x - pad[1].w / 2 - ball.w / 2;
         generateParticles(ball, ball.x, ball.y);
     }
 
-    // Render paddles, ball, and particles
-    p1.render();
-    p2.render();
+    // Render ball and particles
     ball.render();
     renderParticles();
-}
 
-function gameLoop() {
-    main();
     requestAnimationFrame(gameLoop);
 }
 
-gameLoop(); // Start the game loop
+// Start the game loop
+gameLoop();
 
+// Function to constrain paddles within the canvas
+function constrainPaddles(paddle) {
+    if (paddle.y - paddle.h / 2 < 0) {
+        paddle.y = paddle.h / 2;
+    } else if (paddle.y + paddle.h / 2 > c.height) {
+        paddle.y = c.height - paddle.h / 2;
+    }
+}
+
+// Function to handle ball collision with walls
+function handleBallCollisionWithWalls() {
+    if (ball.y - ball.h / 2 < 0 || ball.y + ball.h / 2 > c.height) {
+        ball.vy = -ball.vy;
+    }
+    if (ball.x - ball.w / 2 < 0) {
+        player[1].updateScore(1);
+        resetBall();
+    } else if (ball.x + ball.w / 2 > c.width) {
+        player[0].updateScore(1);
+        resetBall();
+    }
+}
+
+// Function to reset the ball's position and speed
+function resetBall() {
+    ball.x = c.width / 2;
+    ball.y = c.height / 2;
+    ball.vx = (Math.random() > 0.5 ? 1 : -1) * 5;
+    ball.vy = (Math.random() * 4) - 2;
+}
+
+// Function to detect collision between two objects
 function collide(obj1, obj2) {
     return obj1.x - obj1.w / 2 < obj2.x + obj2.w / 2 &&
            obj1.x + obj1.w / 2 > obj2.x - obj2.w / 2 &&
@@ -60,87 +98,30 @@ function collide(obj1, obj2) {
            obj1.y + obj1.h / 2 > obj2.y - obj2.h / 2;
 }
 
-function handleInput() {
-    // Paddle 1 (p1) controls: W and S keys
-    if (keys['w']) {
-        p1.vy = -5; // Move up
-    } else if (keys['s']) {
-        p1.vy = 5; // Move down
-    } else {
-        p1.vy = 0; // Stop
-    }
-
-    // Paddle 2 (p2) controls: Up and Down arrow keys
-    if (keys['ArrowUp']) {
-        p2.vy = -5; // Move up
-    } else if (keys['ArrowDown']) {
-        p2.vy = 5; // Move down
-    } else {
-        p2.vy = 0; // Stop
-    }
-}
-
-function constrainPaddles() {
-    // Constrain Paddle 1 (p1) within the canvas height
-    if (p1.y - p1.h / 2 < 0) {
-        p1.y = p1.h / 2;
-    } else if (p1.y + p1.h / 2 > c.height) {
-        p1.y = c.height - p1.h / 2;
-    }
-
-    // Constrain Paddle 2 (p2) within the canvas height
-    if (p2.y - p2.h / 2 < 0) {
-        p2.y = p2.h / 2;
-    } else if (p2.y + p2.h / 2 > c.height) {
-        p2.y = c.height - p2.h / 2;
-    }
-}
-
-function handleBallCollisionWithWalls() {
-    // Ball collision with top and bottom walls
-    if (ball.y - ball.h / 2 < 0 || ball.y + ball.h / 2 > c.height) {
-        ball.vy = -ball.vy; // Reverse vertical direction
-    }
-
-    // Ball goes out of bounds (left or right)
-    if (ball.x - ball.w / 2 < 0) {
-        player2.updateScore(1); // Player 2 scores
-        resetBall();
-    } else if (ball.x + ball.w / 2 > c.width) {
-        player1.updateScore(1); // Player 1 scores
-        resetBall();
-    }
-}
-
-function resetBall() {
-    ball.x = c.width / 2;
-    ball.y = c.height / 2;
-    ball.vx = (Math.random() > 0.5 ? 1 : -1) * 5; // Random direction
-    ball.vy = (Math.random() * 4) - 2; // Random vertical speed
-}
-
+// Function to generate particles on collision
 function generateParticles(ball, x, y) {
     const particles = [];
-    const particleCount = 20; // Number of particles to generate
+    const particleCount = 20;
 
     for (let i = 0; i < particleCount; i++) {
         particles.push({
             x: x,
             y: y,
-            vx: (Math.random() - 0.5) * 4, // Random velocity on x-axis
-            vy: (Math.random() - 0.5) * 4, // Random velocity on y-axis
-            color: `rgba(255, 64, 0, ${Math.random()})`, // Yellow particles with random opacity
-            life: Math.random() * 20 // Random lifespan
+            vx: (Math.random() - 0.5) * 4,
+            vy: (Math.random() - 0.5) * 4,
+            color: `rgba(255, 64, 0, ${Math.random()})`,
+            life: Math.random() * 20
         });
     }
 
     renderParticles(particles);
 }
 
+// Function to render particles
 function renderParticles(particles) {
     particles.forEach(p => {
         ctx.beginPath();
-        ctx.arc(p.x, p.y, 3, 0, Math.PI * 2); // Draw particle as a small circle
+        ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
         ctx.fillStyle = p.color;
         ctx.fill();
         p.x += p.vx;
@@ -148,6 +129,24 @@ function renderParticles(particles) {
         p.life -= 1;
     });
 
-    // Remove particles that have expired
     particles = particles.filter(p => p.life > 0);
+}
+
+// Function to handle input (optional, depending on your game setup)
+function handleInput() {
+    if (keys['w']) {
+        pad[0].vy = -5;
+    } else if (keys['s']) {
+        pad[0].vy = 5;
+    } else {
+        pad[0].vy = 0;
+    }
+
+    if (keys['ArrowUp']) {
+        pad[1].vy = -5;
+    } else if (keys['ArrowDown']) {
+        pad[1].vy = 5;
+    } else {
+        pad[1].vy = 0;
+    }
 }
