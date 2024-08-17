@@ -2,22 +2,30 @@ body {
     margin: 0;
     padding: 0;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     height: 100vh;
     background-color: #CED0CE;
 }
 
+#score {
+    display: flex;
+    justify-content: space-between;
+    width: 800px;
+    margin-bottom: 10px; 
+}
+
+#score div {
+    font-size: 24px;
+    font-weight: bold;
+    color: #ffffff; 
+    background-color: #333333;
+    padding: 10px;
+    border-radius: 5px;
+}
+
 canvas {
-    border: 5px solid #ffffff; /* White border around the canvas */
-    background-color: #E6E8E6; /* Slightly different red for the canvas */
-}
-
-/* Optional: Customize the paddle and ball colors */
-.paddle {
-    background-color: #ffffff; /* White paddles */
-}
-
-.ball {
-    background-color: #ffffff; /* White ball */
+    border: 5px solid #ffffff;
+    background-color: #00d600;
 }

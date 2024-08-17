@@ -14,7 +14,8 @@ class Box {
         this.y += this.vy;
     }
 
-    render() {
+    render(ctx) {
+        console.log('Rendering box at', this.x, this.y); // Debug log
         ctx.save();
         ctx.translate(this.x, this.y);
         ctx.fillStyle = this.color;
