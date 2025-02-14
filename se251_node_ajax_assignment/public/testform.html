@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+        <input type="text" name="make" value="Chevy"><br>
+        <input type="text" name="model" value="Corvette"><br>
+        <input type="number" name="year" maxlength="4" value="2010"><br>
+        <button>Submit</button>
+  
+    <div id="output">
+
+    </div>
+    <script>
+
+    window.addEventListener(`load`, load)
+
+
+    async function load(e){
+        var promise = await fetch("http://localhost:80/jeep");
+        var data = await promise.json(data)
+        // let sortedData = data.sort((a, b) => (b.year - a.year));
+        console.log(data)
+
+        var output = document.querySelector(`#output`);
+        var message =``
+        for(let i=0; i<data.length; i++)
+        {
+            message += `<div class="item">`
+                for(let item in data[i])
+                {
+                    message += `<p>${item}:${data[i][item]}</p>`
+                }
+
+            //add a button
+                message += `<button class = "deleteButton">Delete</button>`
+            message += '</div>'
+        }
+
+        output.innerHTML = message
+
+        document.querySelectorAll(`.deleteButton`)
+        var buttons = document.querySelectorAll(`.deleteButton`)
+
+        const deleteItem = async (num) =>{
+            
+
+        }
+
+        for (let i = 0; i < buttons.length; i++){
+            buttons[i].addEventListener("click", async (e)=>{
+                await fetch("http://localhost:80/delete",
+                {
+                    method:"POST",
+                    body:
+                        JSON.stringify({index:i}),
+            
+                    headers: {
+                        "Content-type": "application/json; charset=UTF-8"
+                    }
+                    
+                }
+            )
+                load()
+            })
+            
+        }
+
+        //query select all the buttons
+        //add event listeners to each button
+            //send the index number of the button you selected to the `delete` route
+            //the object you send could look like this {index:/*correct index number goes here*/}
+            //call the load function to update the page
+        
+
+    }
+
+
+    document.querySelector(`button`).addEventListener(`click`, async (e)=>{
+
+       await fetch("http://localhost:80/jeep", {
+    
+            // Adding method type
+            method: "POST",
+            
+            // Adding body or contents to send
+            body: JSON.stringify({
+                make: document.querySelector(`input[name="make"]`).value,
+                model: document.querySelector(`input[name="model"]`).value,
+                year: document.querySelector(`input[name="year"]`).value
+            }),
+            
+            // Adding headers to the request
+            headers: {
+                "Content-type": "application/json; charset=UTF-8"
+            }
+        })
+
+        load()
+    })    
+   
+    </script>
+</body>
+</html>
